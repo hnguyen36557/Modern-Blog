@@ -1,17 +1,17 @@
-@extens('layouts.master')
+@extends('layouts.master')
 
 @section('title')
 
-	Post Title
+	{{$post->title}}
 
 @endsection
 
 @section('content')
 
 	<article>
-		<h1>Post Title</h1>
-		<span class="subtitle">Post Author </span>
-		<p>Post Body</p>
+		<h1>{{ $post->title }}</h1>
+		<span class="subtitle">{{$post->author}} | {{ $post->created_at }}</span>
+		<p>{{ $post->body }}</p>
 	</article>
 
 @endsection

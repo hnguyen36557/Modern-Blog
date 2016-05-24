@@ -23,13 +23,63 @@ class PostController extends Controller
     }
 
     public function getSinglePost($post_id, $end = 'frontend') {
-    	
-    	return view($end . '.blog.single');
+    	$post = Post::find($post_id);
+        if(!$post) {
+            return redirect()->route('blog.index')->with(['fail' => 'Post not found']);
+        }
+    	return view($end . '.blog.single',['post' => $post, 'categories' => $categories, 'post_categories' => $post_categories, 'post_categories_ids' => $post_categories_ids]);
+    }
+
+    public function getUpdatePost($post_id) {
+        $post = Post::find($post_id);
+        $categories = Category::all();
+        $post_categories = $post->categories;
+        $post_categories_ids = array();
+        $i = 0;
+        foreach ($post_categories as $post_category) {
+            $post_categories_ids[$i] = $post_category->id;
+            $i++;
+        }
+        if(!$post) {
+            return redirect()->route('blog.index')->with(['fail' => 'Post not found']);
+        }
+        //find categories
+        return view('admin.blog.edit_post', ['post' => $post]);
+    }
+
+    public function postUpdatePost(Request $request) {
+        $this->validate($request,[
+            'title'  => 'required|max:120',
+            'author' => 'required|max:80',
+            'body'   =>'required'
+        ]);
+        $post = Post::find($request['post_id']);
+        $post->title = $request['title'];
+        $post->author = $request['author'];
+        $post->body = $request['body'];
+        $post->update();
+        $post->categories()->detach();
+        if (strlen($request['categories']) >0 ){
+            $categoryIDs = explode(',', $request['categories']);
+            foreach ($categoryIDs as $categotyID) {
+                $post->categories()->attach($categoryID);
+            }
+        }
+        return redirect()->route('admin.index')->with(['success' => 'Post Update Successfully']);
+    }
+
+    public function getDeletePost($post_id) {
+        $post = Post::find($post_id);
+         if(!$post) {
+            return redirect()->route('blog.index')->with(['fail' => 'Post not found']);
+        }
+        $post->delete();
+        return redirect()->route('admin.index')->with(['success' => 'Delete']);
     }
 
     public function getCreatePost() {
-
-    	return view('admin.blog.create_post');
+        $categories = Category::all();
+    	return view('admin.blog.create_post', ['categories' => $categories]);
     }
 
     public function postCreatePost(Request $request) {
@@ -44,7 +94,12 @@ class PostController extends Controller
     	$post->author = $request['author'];
     	$post->body= $request['body'];
     	$post->save();
-    	// attaching categories
+    	if (strlen($request['categories']) >0 ){
+            $categoryIDs = explode(',', $request['categories']);
+            foreach ($categoryIDs as $categotyID) {
+                $post->categories()->attach($categoryID);
+            }
+        }
     	return redirect()->route('admin.index')->with(['success' => 'Post successfully created']);
     }
     //read more

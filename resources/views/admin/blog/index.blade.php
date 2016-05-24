@@ -23,9 +23,9 @@
 							<div class="edit">
 								<nav>
 									<ul>
-										<li><a href="">View</a></li>
-										<li><a href="">Edit</a></li>
-										<li><a href="" class="danger">Delete</a></li>
+										<li><a href="{{ route('admin.blog.post',['post_id' => $post->id, 'end' => 'admin']) }}">View</a></li>
+										<li><a href="{{ route('admin.blog.post.edit',['post_id' => $post->id]) }}">Edit</a></li>
+										<li><a href="{{ route('admin.blog.post.delete', ['post_id' => $post->id]) }}" class="danger">Delete</a></li>
 									</ul>
 								</nav>
 							</div>
@@ -34,14 +34,14 @@
 				@endif
 		</section>
 		@if($posts->lastPage() > 1)
-		<secion class="pagination">
-			@if( $posts->currentPage() !== 1 )
-			@endif
-			@if( $posts->currentPage() !== $posts->lastPage() )
-				<a href="{{ $posts->nextPageUrl() }}"><i class="fa fa-caret-right"></i></a>
-			@endif
-		</secion>
-	@endif
+			<secion class="pagination">
+				@if( $posts->currentPage() !== 1 )
+				@endif
+				@if( $posts->currentPage() !== $posts->lastPage() )
+					<a href="{{ $posts->nextPageUrl() }}"><i class="fa fa-caret-right"></i></a>
+				@endif
+			</secion>
+		@endif
 	</div>
 
 @endsection
